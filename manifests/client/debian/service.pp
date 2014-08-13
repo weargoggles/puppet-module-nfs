@@ -4,7 +4,12 @@ class nfs::client::debian::service {
     require => Class['nfs::client::debian::configure']
   }
 
-    service { "portmap":
+  $portmap_service_name = $operatingsystem ? {
+    ubuntu => 'rpcbind',
+    default => 'portmap'
+  }
+
+    service { $portmap_service_name:
       ensure    => running,
       enable    => true,
       hasstatus => false,
