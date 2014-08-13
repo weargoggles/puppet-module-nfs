@@ -33,7 +33,7 @@ This will export /data/folder on the server and automagically mount it on client
     include nfs::server
     nfs::server::export{ '/data_folder':
       ensure  => 'mounted',
-      clients => '10.0.0.0/24(rw,insecure,async,no_root_squash) localhost(rw)'
+      clients => [ '10.0.0.0/24(rw,insecure,async,no_root_squash)', 'localhost(rw)' ],
   }
 
   # By default, mounts are mounted in the same folder on the clients as
@@ -55,11 +55,11 @@ This will export /data/folder on the server and automagically mount it on client
     nfs::server::export{ 
       '/data_folder':
         ensure  => 'mounted',
-        clients => '10.0.0.0/24(rw,insecure,async,no_root_squash) localhost(rw)'
+        clients => [ '10.0.0.0/24(rw,insecure,async,no_root_squash) localhost(rw)' ],
       # exports /homeexports and mounts them om /srv/home on the clients
       '/homeexport':
         ensure  => 'mounted',
-        clients => '10.0.0.0/24(rw,insecure,async,root_squash)',
+        clients => [ '10.0.0.0/24(rw,insecure,async,root_squash)' ],
         mount   => '/srv/home'
   }
 
@@ -71,7 +71,7 @@ This will export /data/folder on the server and automagically mount it on client
       '/media_library':
         ensure  => 'present',
         nfstag     => 'media'
-        clients => '10.0.0.0/24(rw,insecure,async,no_root_squash) localhost(rw)'
+        clients => [ '10.0.0.0/24(rw,insecure,async,no_root_squash)', 'localhost(rw)' ]
   }
 
   node client {
@@ -136,7 +136,7 @@ This will export /data/folder on the server and automagically mount it on client
     }
     nfs::server::export{ '/data_folder':
       ensure  => 'mounted',
-      clients => '10.0.0.0/24(rw,insecure,no_subtree_check,async,no_root_squash) localhost(rw)'
+      clients => [ '10.0.0.0/24(rw,insecure,no_subtree_check,async,no_root_squash)', 'localhost(rw)' ]
   }
 
   # By default, mounts are mounted in the same folder on the clients as
@@ -176,6 +176,8 @@ This will export /data/folder on the server and automagically mount it on client
   node server {
     class { 'nfs::server':
       nfs_v4              => true,
+      # Turn on Kerberos support
+      nfs_v4_secure       => true,
       # Below are defaults
       nfs_v4_idmap_domain => $::domain,
       nfs_v4_export_root  => '/export',
@@ -208,12 +210,14 @@ This will export /data/folder on the server and automagically mount it on client
       # storeconfigs, kick ass.
       nfstag     => undef,
       # copied directly into /etc/exports as a string, for simplicity
-      clients => '10.0.0.0/24(rw,insecure,no_subtree_check,async,no_root_squash)'
+      clients => [ '10.0.0.0/24(rw,insecure,no_subtree_check,async,no_root_squash)' ],
   }
 
   node client {
     class { 'nfs::server':
       nfs_v4              => true,
+      # Turn on Kerberos support
+      nfs_v4_secure       => true,
       nfs_v4_idmap_domain => $::domain
       nfs_v4_mount_root   => '/srv',
     }

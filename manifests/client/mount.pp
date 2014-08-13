@@ -32,7 +32,7 @@ define nfs::client::mount (
 ) {
 
   include nfs::client
-
+  Class["nfs::client"] -> Nfs::Client::Mount["$title"]
 
   if $nfs::client::nfs_v4 == true {
 
@@ -67,7 +67,7 @@ define nfs::client::mount (
 
   } else {
 
-    if $mount == undef {
+    if $mount == $title {
       $_mount = $share
     } else {
      $_mount = $mount
